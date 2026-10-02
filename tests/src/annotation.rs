@@ -1,4 +1,4 @@
-use krilla::annotation::LinkBorder;
+use krilla::annotation::{Annotation, LinkBorder, NoteIcon, TextAnnotation};
 use krilla::destination::XyzDestination;
 use krilla::geom::{Point, Quadrilateral, Rect, Size};
 use krilla::page::{Page, PageSettings};
@@ -129,4 +129,45 @@ fn annotation_to_embedded_pdf_page(document: &mut Document) {
     surface.draw_path(&rect_to_path(50.0, 0.0, 150.0, 100.0));
     surface.finish();
     page.finish();
+}
+
+#[snapshot]
+fn annotation_text_visible(page: &mut Page) {
+    page.add_annotation(Annotation::new_text(
+        TextAnnotation::new(Rect::from_xywh(50.0, 50.0, 100.0, 20.0).unwrap()),
+        "A note.".to_string(),
+    ));
+}
+
+#[snapshot]
+fn annotation_text_invisible(page: &mut Page) {
+    page.add_annotation(Annotation::new_text(
+        TextAnnotation::new(Rect::from_xywh(50.0, 50.0, 100.0, 20.0).unwrap()).with_invisible(true),
+        "A tooltip.".to_string(),
+    ));
+}
+
+#[snapshot]
+fn annotation_text_with_properties(page: &mut Page) {
+    use krilla::color::rgb;
+    use krilla::metadata::DateTime;
+    use krilla::num::NormalizedF32;
+
+    page.add_annotation(
+        Annotation::new_text(
+            TextAnnotation::new(Rect::from_xywh(50.0, 50.0, 100.0, 20.0).unwrap())
+                .with_icon(NoteIcon::Note)
+                .with_open(true),
+            "A note with properties.".to_string(),
+        )
+        .with_author(Some("Jane Doe".to_string()))
+        .with_subject(Some("Review".to_string()))
+        .with_modified(Some(DateTime::new(2026).month(10).day(2)))
+        .with_name(Some("note-1".to_string()))
+        .with_color(Some(rgb::Color::new(0, 128, 255).into()))
+        .with_opacity(NormalizedF32::new(0.5).unwrap())
+        .with_printable(Some(true))
+        .with_read_only(true)
+        .with_locked(true),
+    );
 }

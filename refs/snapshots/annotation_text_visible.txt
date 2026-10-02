@@ -1,0 +1,122 @@
+%PDF-1.7
+%AAAA
+
+1 0 obj
+<<
+  /Type /Pages
+  /Count 1
+  /Kids [5 0 R]
+>>
+endobj
+
+2 0 obj
+<<
+  /Type /Annot
+  /Subtype /Text
+  /Rect [50 130 70 150]
+  /Name /Comment
+  /AP <<
+    /N 7 0 R
+  >>
+  /F 24
+  /Contents (A note.)
+>>
+endobj
+
+3 0 obj
+<<
+  /ProcSet [/PDF /Text /ImageC /ImageB]
+>>
+endobj
+
+4 0 obj
+<<
+  /ProcSet [/PDF /Text /ImageC /ImageB]
+>>
+endobj
+
+5 0 obj
+<<
+  /Type /Page
+  /Resources 4 0 R
+  /MediaBox [0 0 200 200]
+  /Tabs /S
+  /Parent 1 0 R
+  /Contents 6 0 R
+  /Annots [2 0 R]
+>>
+endobj
+
+6 0 obj
+<<
+  /Length 0
+>>
+stream
+
+endstream
+endobj
+
+7 0 obj
+<<
+  /Length 164
+  /Type /XObject
+  /Subtype /Form
+  /Resources 3 0 R
+  /BBox [0 0 20 20]
+>>
+stream
+q
+1 0.8392157 0.2 rg
+0 G
+0.75 w
+2 18.5 m
+18 18.5 l
+18 6.5 l
+9 6.5 l
+4.5 2 l
+4.5 6.5 l
+2 6.5 l
+h
+B
+Q
+q
+0 G
+0.5 w
+5 15 m
+15 15 l
+5 12.5 m
+15 12.5 l
+5 10 m
+15 10 l
+S
+Q
+endstream
+endobj
+
+8 0 obj
+<<
+  /Type /Catalog
+  /Pages 1 0 R
+>>
+endobj
+
+xref
+0 9
+0000000000 65535 f
+0000000016 00000 n
+0000000080 00000 n
+0000000232 00000 n
+0000000294 00000 n
+0000000356 00000 n
+0000000500 00000 n
+0000000552 00000 n
+0000000843 00000 n
+trailer
+<<
+  /Size 9
+  /Root 8 0 R
+  /ID [(jrvR/iUZDUAIyqDMwLauKQ==) (jrvR/iUZDUAIyqDMwLauKQ==)]
+>>
+startxref
+897
+%%EOF

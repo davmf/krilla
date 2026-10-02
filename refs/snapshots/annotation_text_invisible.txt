@@ -1,0 +1,90 @@
+%PDF-1.7
+%AAAA
+
+1 0 obj
+<<
+  /Type /Pages
+  /Count 1
+  /Kids [4 0 R]
+>>
+endobj
+
+2 0 obj
+<<
+  /Type /Annot
+  /Subtype /Text
+  /Rect [50 130 150 150]
+  /Name /Comment
+  /AP <<
+    /N 6 0 R
+  >>
+  /F 4
+  /Contents (A tooltip.)
+>>
+endobj
+
+3 0 obj
+<<
+  /ProcSet [/PDF /Text /ImageC /ImageB]
+>>
+endobj
+
+4 0 obj
+<<
+  /Type /Page
+  /Resources 3 0 R
+  /MediaBox [0 0 200 200]
+  /Tabs /S
+  /Parent 1 0 R
+  /Contents 5 0 R
+  /Annots [2 0 R]
+>>
+endobj
+
+5 0 obj
+<<
+  /Length 0
+>>
+stream
+
+endstream
+endobj
+
+6 0 obj
+<<
+  /Length 0
+  /Type /XObject
+  /Subtype /Form
+  /BBox [0 0 100 20]
+>>
+stream
+
+endstream
+endobj
+
+7 0 obj
+<<
+  /Type /Catalog
+  /Pages 1 0 R
+>>
+endobj
+
+xref
+0 8
+0000000000 65535 f
+0000000016 00000 n
+0000000080 00000 n
+0000000235 00000 n
+0000000297 00000 n
+0000000441 00000 n
+0000000493 00000 n
+0000000600 00000 n
+trailer
+<<
+  /Size 8
+  /Root 7 0 R
+  /ID [(72BZxq/O6aAhzlEzCZWzKw==) (72BZxq/O6aAhzlEzCZWzKw==)]
+>>
+startxref
+654
+%%EOF
