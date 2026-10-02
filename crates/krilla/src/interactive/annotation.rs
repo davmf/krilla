@@ -27,7 +27,8 @@ use crate::serialize::SerializeContext;
 use crate::stream::StreamBuilder;
 use crate::surface::Location;
 
-/// The size of the icon of a visible text annotation, in pt.
+/// The size of the drawn note icon, in pt. Viewers scale it to the
+/// annotation's rect.
 const NOTE_ICON_SIZE: f32 = 20.0;
 
 /// An annotation.
@@ -370,8 +371,8 @@ impl TextAnnotation {
     /// Create a new text annotation.
     ///
     /// `rect`: The region of the page that the annotation should cover. For
-    /// visible annotations, a note icon is drawn at its top-left corner, and
-    /// only the icon is covered.
+    /// visible annotations, the note icon fills this region, so it should be
+    /// roughly square. 20pt is a typical size.
     pub fn new(rect: Rect) -> Self {
         Self {
             rect,
@@ -406,21 +407,9 @@ impl TextAnnotation {
 
     /// The annotation's rectangle in PDF coordinates.
     fn pdf_rect(&self, page_height: f32) -> Rect {
-        let rect = self
-            .rect
+        self.rect
             .transform(page_root_transform(page_height))
-            .unwrap();
-        if self.invisible {
-            rect
-        } else {
-            Rect::from_ltrb(
-                rect.left(),
-                rect.bottom() - NOTE_ICON_SIZE,
-                rect.left() + NOTE_ICON_SIZE,
-                rect.bottom(),
-            )
             .unwrap()
-        }
     }
 
     /// Write the annotation's appearance stream and return its reference.

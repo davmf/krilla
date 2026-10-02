@@ -134,7 +134,7 @@ fn annotation_to_embedded_pdf_page(document: &mut Document) {
 #[snapshot]
 fn annotation_text_visible(page: &mut Page) {
     page.add_annotation(Annotation::new_text(
-        TextAnnotation::new(Rect::from_xywh(50.0, 50.0, 100.0, 20.0).unwrap()),
+        TextAnnotation::new(Rect::from_xywh(50.0, 50.0, 20.0, 20.0).unwrap()),
         "A note.".to_string(),
     ));
 }
@@ -155,7 +155,7 @@ fn annotation_text_with_properties(page: &mut Page) {
 
     page.add_annotation(
         Annotation::new_text(
-            TextAnnotation::new(Rect::from_xywh(50.0, 50.0, 100.0, 20.0).unwrap())
+            TextAnnotation::new(Rect::from_xywh(50.0, 50.0, 12.0, 12.0).unwrap())
                 .with_icon(NoteIcon::Note)
                 .with_open(true),
             "A note with properties.".to_string(),
