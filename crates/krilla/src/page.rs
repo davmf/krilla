@@ -14,7 +14,7 @@ use crate::configure::ValidationError;
 use crate::content::ContentBuilder;
 use crate::error::KrillaResult;
 use crate::geom::{Rect, Size, Transform};
-use crate::interactive::annotation::Annotation;
+use crate::interactive::annotation::{Annotation, AnnotationHandle};
 use crate::interchange::tagging::{Identifier, PageTagIdentifier};
 use crate::resource::ResourceDictionary;
 use crate::serialize::{PageInfo, SerializeContext};
@@ -220,8 +220,16 @@ impl<'a> Page<'a> {
     }
 
     /// Add an annotation to the page.
-    pub fn add_annotation(&mut self, annotation: Annotation) {
+    ///
+    /// The returned handle can be used to reply to the annotation, see
+    /// [`Annotation::with_in_reply_to`].
+    pub fn add_annotation(&mut self, annotation: Annotation) -> AnnotationHandle {
+        let index = self.annotations.len();
         self.annotations.push(annotation);
+        AnnotationHandle {
+            page_index: self.page_index,
+            index,
+        }
     }
 
     /// Add a tagged annotation to the page.
@@ -388,13 +396,16 @@ impl InternalPage {
         let mut annotation_refs = vec![];
 
         if !self.annotations.is_empty() {
-            for annotation in &self.annotations {
-                let annot_ref = sc.new_ref();
-
+            // Allocate all references first, so that replies can refer to
+            // the annotations they reply to.
+            let refs: Vec<Ref> = self.annotations.iter().map(|_| sc.new_ref()).collect();
+            for (annotation, &annot_ref) in self.annotations.iter().zip(&refs) {
                 annotation.serialize(
                     sc,
                     chunk_container,
                     annot_ref,
+                    self.page_index,
+                    &refs,
                     self.page_settings.surface_size().height(),
                 )?;
                 annotation_refs.push((annot_ref, OnceCell::new()));

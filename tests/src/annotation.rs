@@ -171,3 +171,46 @@ fn annotation_text_with_properties(page: &mut Page) {
         .with_locked(true),
     );
 }
+
+#[snapshot]
+fn annotation_text_reply(page: &mut Page) {
+    use krilla::annotation::ReviewState;
+
+    let rect = Rect::from_xywh(50.0, 50.0, 20.0, 20.0).unwrap();
+    let parent = page.add_annotation(
+        Annotation::new_text(TextAnnotation::new(rect), "A comment.".to_string())
+            .with_author(Some("Ana".to_string())),
+    );
+    let reply = page.add_annotation(
+        Annotation::new_text(TextAnnotation::new(rect), "A reply.".to_string())
+            .with_author(Some("Ben".to_string()))
+            .with_in_reply_to(Some(parent)),
+    );
+    page.add_annotation(
+        Annotation::new_text(TextAnnotation::new(rect), "Accepted.".to_string())
+            .with_author(Some("Ana".to_string()))
+            .with_in_reply_to(Some(reply))
+            .with_review_state(Some(ReviewState::Accepted)),
+    );
+}
+
+#[test]
+#[should_panic]
+fn annotation_reply_to_other_page() {
+    let mut d = Document::new_with(settings_1());
+    let rect = Rect::from_xywh(50.0, 50.0, 20.0, 20.0).unwrap();
+    let mut page = d.start_page_with(PageSettings::from_wh(200.0, 200.0).unwrap());
+    let parent = page.add_annotation(Annotation::new_text(
+        TextAnnotation::new(rect),
+        "A comment.".to_string(),
+    ));
+    page.finish();
+    let mut page = d.start_page_with(PageSettings::from_wh(200.0, 200.0).unwrap());
+    page.add_annotation(
+        Annotation::new_text(TextAnnotation::new(rect), "A reply.".to_string())
+            .with_in_reply_to(Some(parent)),
+    );
+    page.finish();
+
+    let _ = d.finish();
+}

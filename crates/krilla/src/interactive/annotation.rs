@@ -44,6 +44,8 @@ pub struct Annotation {
     pub(crate) printable: Option<bool>,
     pub(crate) read_only: bool,
     pub(crate) locked: bool,
+    pub(crate) in_reply_to: Option<AnnotationHandle>,
+    pub(crate) review_state: Option<ReviewState>,
     pub(crate) struct_parent: Option<i32>,
     pub(crate) location: Option<Location>,
 }
@@ -62,6 +64,8 @@ impl Annotation {
             printable: None,
             read_only: false,
             locked: false,
+            in_reply_to: None,
+            review_state: None,
             struct_parent: None,
             location: None,
         }
@@ -155,6 +159,67 @@ impl Annotation {
     }
 }
 
+impl Annotation {
+    /// Makes the annotation a reply to another annotation on the same page.
+    ///
+    /// Viewers that support replies show them in a thread below the
+    /// annotation they reply to, and typically don't draw them on the page.
+    /// Replies are usually text annotations with the same rect as the
+    /// annotation they reply to.
+    ///
+    /// # Panics
+    /// Panics when the page is serialized if `parent` belongs to another
+    /// page.
+    pub fn with_in_reply_to(mut self, parent: Option<AnnotationHandle>) -> Self {
+        self.in_reply_to = parent;
+        self
+    }
+
+    /// Sets the review state that a reply gives to the annotation it replies
+    /// to, for example to mark a comment as accepted.
+    ///
+    /// Ignored unless the annotation is a reply.
+    pub fn with_review_state(mut self, state: Option<ReviewState>) -> Self {
+        self.review_state = state;
+        self
+    }
+}
+
+/// A handle to an annotation on a page, returned by
+/// [`Page::add_annotation`](crate::page::Page::add_annotation).
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub struct AnnotationHandle {
+    pub(crate) page_index: usize,
+    pub(crate) index: usize,
+}
+
+/// The review state of an annotation, set by a reply.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub enum ReviewState {
+    /// The user agrees with the annotation.
+    Accepted,
+    /// The user disagrees with the annotation.
+    Rejected,
+    /// The annotation has been cancelled.
+    Cancelled,
+    /// The annotation has been dealt with.
+    Completed,
+    /// The review state has been reset.
+    None,
+}
+
+impl ReviewState {
+    fn to_name(self) -> Name<'static> {
+        match self {
+            ReviewState::Accepted => Name(b"Accepted"),
+            ReviewState::Rejected => Name(b"Rejected"),
+            ReviewState::Cancelled => Name(b"Cancelled"),
+            ReviewState::Completed => Name(b"Completed"),
+            ReviewState::None => Name(b"None"),
+        }
+    }
+}
+
 impl From<LinkAnnotation> for Annotation {
     fn from(value: LinkAnnotation) -> Self {
         Self::new(AnnotationType::Link(value), None)
@@ -167,6 +232,8 @@ impl Annotation {
         sc: &mut SerializeContext,
         chunk_container: &mut ChunkContainer,
         root_ref: Ref,
+        page_index: usize,
+        annotation_refs: &[Ref],
         page_height: f32,
     ) -> KrillaResult<()> {
         // Write the appearance stream first, since the annotation writer
@@ -205,15 +272,15 @@ impl Annotation {
                 }
             }
             AnnotationType::Text(t) => {
-                if t.invisible {
-                    // Nothing is drawn, so printing is harmless, and PDF/A
-                    // requires the flag.
+                // The icon of a visible note scales with the page, since
+                // callers choose its rect, for example to fit the text around
+                // it. It isn't printed by default.
+                if t.invisible || requires_flags {
+                    // Nothing is drawn for invisible notes, so printing is
+                    // harmless, and PDF/A requires the flag.
                     AnnotationFlags::PRINT
-                } else if requires_flags {
-                    AnnotationFlags::PRINT | AnnotationFlags::NO_ZOOM | AnnotationFlags::NO_ROTATE
                 } else {
-                    // Keep the note icon off paper and at a fixed size.
-                    AnnotationFlags::NO_ZOOM | AnnotationFlags::NO_ROTATE
+                    AnnotationFlags::empty()
                 }
             }
         };
@@ -235,6 +302,22 @@ impl Annotation {
 
         if let Some(struct_parent) = self.struct_parent {
             annotation.struct_parent(struct_parent);
+        }
+
+        if let Some(parent) = self.in_reply_to {
+            assert_eq!(
+                parent.page_index, page_index,
+                "annotations can only reply to annotations on the same page"
+            );
+            annotation
+                .insert(Name(b"IRT"))
+                .primitive(annotation_refs[parent.index]);
+            if let Some(state) = self.review_state {
+                annotation
+                    .insert(Name(b"StateModel"))
+                    .primitive(Name(b"Review"));
+                annotation.insert(Name(b"State")).primitive(state.to_name());
+            }
         }
 
         if let Some(alt_text) = &self.alt {
