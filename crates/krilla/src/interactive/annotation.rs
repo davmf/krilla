@@ -37,6 +37,7 @@ pub struct Annotation {
     pub(crate) alt: Option<String>,
     pub(crate) author: Option<String>,
     pub(crate) subject: Option<String>,
+    pub(crate) created: Option<DateTime>,
     pub(crate) modified: Option<DateTime>,
     pub(crate) name: Option<String>,
     pub(crate) color: Option<Color>,
@@ -57,6 +58,7 @@ impl Annotation {
             alt,
             author: None,
             subject: None,
+            created: None,
             modified: None,
             name: None,
             color: None,
@@ -103,6 +105,12 @@ impl Annotation {
     /// Sets a short description of the annotation's subject.
     pub fn with_subject(mut self, subject: Option<String>) -> Self {
         self.subject = subject;
+        self
+    }
+
+    /// Sets the date and time at which the annotation was created.
+    pub fn with_created(mut self, created: Option<DateTime>) -> Self {
+        self.created = created;
         self
     }
 
@@ -334,6 +342,10 @@ impl Annotation {
 
         if let Some(subject) = &self.subject {
             annotation.subject(TextStr(subject));
+        }
+
+        if let Some(created) = self.created {
+            annotation.pair(Name(b"CreationDate"), pdf_date(created));
         }
 
         if let Some(modified) = self.modified {
